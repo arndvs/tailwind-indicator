@@ -1,6 +1,6 @@
 {
   "name": "tailwind-indicator",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Tiny screen-size indicator for Tailwind CSS — shows current breakpoint, dimensions, orientation, and pixel ratio",
   "author": "arndvs",
   "license": "MIT",
@@ -20,7 +20,8 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "global.d.ts"
   ],
   "scripts": {
     "build": "tsup",
