@@ -15,8 +15,9 @@ const STYLES = `
     z-index: 2147483647;
     display: flex;
     align-items: center;
+    gap: 2px;
     height: 24px;
-    padding: 0 10px;
+    padding: 0 4px 0 10px;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-size: 11px;
     line-height: 1;
@@ -26,7 +27,7 @@ const STYLES = `
     opacity: 0.9;
     pointer-events: none;
     user-select: none;
-    transition: opacity 0.15s;
+    transition: opacity 0.2s, transform 0.2s;
   }
   :host(:hover) {
     opacity: 1;
@@ -34,6 +35,11 @@ const STYLES = `
   }
   :host([hidden]) {
     display: none;
+  }
+  :host(.fade-out) {
+    opacity: 0;
+    transform: translateY(8px);
+    pointer-events: none;
   }
   .sep {
     margin: 0 6px;
@@ -43,17 +49,41 @@ const STYLES = `
     color: #38bdf8;
     font-weight: 600;
   }
+  .close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    margin-left: 4px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: #94a3b8;
+    border-radius: 50%;
+    cursor: pointer;
+    pointer-events: auto;
+    font-size: 13px;
+    line-height: 1;
+    transition: color 0.1s, background 0.1s;
+  }
+  .close:hover {
+    color: #f1f5f9;
+    background: rgba(255,255,255,0.1);
+  }
 `;
 
 class TailwindIndicator extends HTMLElement {
   private _shadow: ShadowRoot;
   private _content: HTMLSpanElement;
+  private _closeBtn: HTMLButtonElement;
   private _resizeHandler: () => void;
   private _keyHandler: (e: KeyboardEvent) => void;
   private _breakpoints: Record<string, number> = DEFAULT_BREAKPOINTS;
+  private _hideTimer: ReturnType<typeof setTimeout> | null = null;
 
   static get observedAttributes() {
-    return ['breakpoints', 'position', 'hotkey'];
+    return ['breakpoints', 'position', 'hotkey', 'auto-hide'];
   }
 
   constructor() {
@@ -67,7 +97,20 @@ class TailwindIndicator extends HTMLElement {
     this._content = document.createElement('span');
     this._shadow.appendChild(this._content);
 
-    this._resizeHandler = () => this._update();
+    this._closeBtn = document.createElement('button');
+    this._closeBtn.className = 'close';
+    this._closeBtn.setAttribute('aria-label', 'Close indicator');
+    this._closeBtn.textContent = '×';
+    this._closeBtn.addEventListener('click', () => {
+      this.hidden = true;
+    });
+    this._shadow.appendChild(this._closeBtn);
+
+    this._resizeHandler = () => {
+      this._show();
+      this._update();
+      this._scheduleAutoHide();
+    };
     this._keyHandler = (e: KeyboardEvent) => this._handleKey(e);
   }
 
@@ -82,6 +125,7 @@ class TailwindIndicator extends HTMLElement {
   disconnectedCallback() {
     window.removeEventListener('resize', this._resizeHandler);
     window.removeEventListener('keydown', this._keyHandler);
+    if (this._hideTimer) clearTimeout(this._hideTimer);
   }
 
   attributeChangedCallback(name: string) {
@@ -129,6 +173,27 @@ class TailwindIndicator extends HTMLElement {
         host.style.bottom = '4px';
         host.style.left = '4px';
     }
+  }
+
+  private _getAutoHideMs(): number | null {
+    const attr = this.getAttribute('auto-hide');
+    if (attr === null) return null;
+    const ms = Number(attr);
+    return ms > 0 ? ms : null;
+  }
+
+  private _scheduleAutoHide() {
+    if (this._hideTimer) clearTimeout(this._hideTimer);
+    const ms = this._getAutoHideMs();
+    if (!ms) return;
+    this._hideTimer = setTimeout(() => {
+      (this._shadow.host as HTMLElement).classList.add('fade-out');
+    }, ms);
+  }
+
+  private _show() {
+    this.hidden = false;
+    (this._shadow.host as HTMLElement).classList.remove('fade-out');
   }
 
   private _handleKey(e: KeyboardEvent) {

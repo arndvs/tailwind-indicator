@@ -61,6 +61,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 | `breakpoints` | Tailwind v3 defaults | JSON object mapping breakpoint names to pixel values |
 | `position`    | `bottom-left`      | `bottom-left`, `bottom-right`, `top-left`, `top-right` |
 | `hotkey`      | `ctrl+shift+t`     | Keyboard shortcut to toggle visibility             |
+| `auto-hide`   | _(off)_            | Milliseconds after last resize before fading out   |
+
+The indicator includes a close button (×) for quick dismissal. Use the hotkey to bring it back.
 
 ### Custom breakpoints
 
@@ -80,6 +83,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 ```html
 <tailwind-indicator hotkey="ctrl+shift+d"></tailwind-indicator>
+```
+
+### Auto-hide after resize
+
+Shows on resize, fades out after 3 seconds of inactivity:
+
+```html
+<tailwind-indicator auto-hide="3000"></tailwind-indicator>
 ```
 
 ## API
