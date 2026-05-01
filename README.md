@@ -34,7 +34,7 @@ Add a [triple-slash reference](https://www.typescriptlang.org/docs/handbook/trip
 /// <reference types="tailwind-indicator/global" />
 ```
 
-Or add it to your `tsconfig.json`:
+Or append it to `compilerOptions.types` in your `tsconfig.json` (keep any existing entries like `node`, `react`, etc.):
 
 ```json
 {
