@@ -17,6 +17,9 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
+    },
+    "./global": {
+      "types": "./global.d.ts"
     }
   },
   "files": [
