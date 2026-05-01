@@ -26,6 +26,24 @@ Then drop the element anywhere in your layout:
 <tailwind-indicator></tailwind-indicator>
 ```
 
+#### TypeScript JSX support
+
+Add a [triple-slash reference](https://www.typescriptlang.org/docs/handbook/triple-slash-directives.html) to get type-safe `<tailwind-indicator />` in TSX without `@ts-expect-error`:
+
+```ts
+/// <reference types="tailwind-indicator/global" />
+```
+
+Or append it to `compilerOptions.types` in your `tsconfig.json` (keep any existing entries like `node`, `react`, etc.):
+
+```json
+{
+  "compilerOptions": {
+    "types": ["tailwind-indicator/global"]
+  }
+}
+```
+
 **Next.js App Router** — import in your root layout:
 
 ```tsx
@@ -38,7 +56,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         {children}
         {process.env.NODE_ENV === 'development' && (
-          // @ts-expect-error — custom element
           <tailwind-indicator />
         )}
       </body>
